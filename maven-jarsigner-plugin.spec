@@ -3,10 +3,9 @@
 
 Name:             maven-jarsigner-plugin
 Version:          1.2
-Release:          3
+Release:          8%{?dist}
 Summary:          Signs or verifies a project artifact and attachments using jarsigner
 License:          ASL 2.0
-Group:            Development/Java
 URL:              http://maven.apache.org/plugins/%{name}/
 # http://search.maven.org/remotecontent?filepath=org/apache/maven/plugins/maven-jarsigner-plugin/1.2/maven-jarsigner-plugin-1.2-source-release.zip
 Source0:          http://search.maven.org/remotecontent?filepath=org/apache/maven/plugins/%{name}/%{version}/%{name}-%{version}-source-release.zip
@@ -14,16 +13,7 @@ Source0:          http://search.maven.org/remotecontent?filepath=org/apache/mave
 BuildArch:        noarch
 
 BuildRequires:    java-devel
-BuildRequires:    jpackage-utils
-BuildRequires:    maven
-
-Requires:         java
-Requires:         jpackage-utils
-Requires:         maven
-Requires:         plexus-utils
-
-Requires(post):   jpackage-utils
-Requires(postun): jpackage-utils
+BuildRequires:    maven-local
 
 %description
 This plugin provides the capability to sign or verify
@@ -38,11 +28,8 @@ and all attached artifacts, just configure the verify goal
 appropriately in your pom.xml for the verification to occur
 automatically during the verify phase.
 
-
 %package javadoc
 Summary:          API documentation for %{name}
-Group:            Development/Java
-Requires:         jpackage-utils
 
 %description javadoc
 This package contains the API documentation for %{name}.
@@ -51,35 +38,42 @@ This package contains the API documentation for %{name}.
 %setup -q
 
 %build
-mvn-rpmbuild install javadoc:aggregate
+
+%mvn_file :%{name} %{name}
+%mvn_build
 
 %install
-# jars
-install -d -m 755 %{buildroot}%{_javadir}
-install -p -m 644 target/%{name}-%{version}.jar %{buildroot}%{_javadir}/%{name}.jar
+%mvn_install
 
-# pom
-install -d -m 755 %{buildroot}%{_mavenpomdir}
-install -pm 644 pom.xml %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
-%add_to_maven_depmap %{group_id} %{name} %{version} JPP %{name}
-
-# javadoc
-install -d -m 755 %{buildroot}%{_javadocdir}/%{name}
-cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
-
-%post
-%update_maven_depmap
-
-%postun
-%update_maven_depmap
-
-%files
+%files -f .mfiles
 %doc LICENSE NOTICE DEPENDENCIES
-%{_javadir}/%{name}.jar
-%{_mavenpomdir}/JPP-%{name}.pom
-%{_mavendepmapfragdir}/%{name}
 
-%files javadoc
-%doc LICENSE
-%doc %{_javadocdir}/%{name}
+%files javadoc -f .mfiles-javadoc
+%doc LICENSE NOTICE
 
+%changelog
+* Mon Aug 12 2013 gil cattaneo <puntogil@libero.it> 1.2-8
+- fix rhbz#992192
+- update to current packaging guidelines
+
+* Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.2-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
+
+* Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.2-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
+
+* Tue Dec 11 2012 Jaromir Capik <jcapik@redhat.com> - 1.2-5
+- Introducing NOTICE in the javadoc subpackage
+- Minor spec file changes according to the latest guidelines
+
+* Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+
+* Fri Jan 13 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+
+* Wed May 25 2011 Jaromir Capik <jcapik@redhat.com> - 1.2-2
+- Missing runtime deps (maven, plexus-utils) added
+
+* Wed May 18 2011 Jaromir Capik <jcapik@redhat.com> - 1.2-1
+- Initial version of the package
