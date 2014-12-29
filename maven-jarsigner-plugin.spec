@@ -1,5 +1,4 @@
 %{?_javapackages_macros:%_javapackages_macros}
-%global bootstrap 1
 Name:             maven-jarsigner-plugin
 Version:          1.3.2
 Release:          3.1
@@ -8,16 +7,13 @@ Group:            Development/Java
 License:          ASL 2.0
 URL:              http://maven.apache.org/plugins/%{name}/
 Source0:          http://repo1.maven.org/maven2/org/apache/maven/plugins/%{name}/%{version}/%{name}-%{version}-source-release.zip
-Source1:	  ftp://ftp.muug.mb.ca/mirror/fedora/linux/development/rawhide/i386/os/Packages/m/maven-jarsigner-plugin-1.3.2-3.fc22.noarch.rpm
 BuildArch:        noarch
 
 BuildRequires:  maven-local
 BuildRequires:  mvn(org.apache.maven.plugin-tools:maven-plugin-annotations)
 BuildRequires:  mvn(org.apache.maven.plugins:maven-plugin-plugin)
 BuildRequires:  mvn(org.apache.maven.plugins:maven-plugins:pom:)
-%if !%bootstrap
 BuildRequires:  mvn(org.apache.maven.shared:maven-jarsigner) >= 1.3.2
-%endif
 BuildRequires:  mvn(org.apache.maven.shared:maven-shared-utils) >= 0.6
 BuildRequires:  mvn(org.apache.maven:maven-artifact)
 BuildRequires:  mvn(org.apache.maven:maven-plugin-api)
@@ -49,34 +45,16 @@ This package contains the API documentation for %{name}.
 
 %build
 
-%if !%bootstrap
 %mvn_file :%{name} %{name}
 # ITs fail on Koji
 %mvn_build
-%endif
 
 %install
 
-%if !%bootstrap
 %mvn_install
-%else
-touch .mfiles
-touch .mfiles-javadoc
-pushd %buildroot
-
-rpm2cpio %{SOURCE1} | cpio -idmv
-
-popd
-
-%endif
 
 %files -f .mfiles
 %doc LICENSE NOTICE DEPENDENCIES
-%if %bootstrap
-/usr/share/java/maven-jarsigner-plugin.jar
-/usr/share/maven-metadata/maven-jarsigner-plugin.xml
-/usr/share/maven-poms/maven-jarsigner-plugin.pom
-%endif
 
 %files javadoc -f .mfiles-javadoc
 %doc LICENSE NOTICE
