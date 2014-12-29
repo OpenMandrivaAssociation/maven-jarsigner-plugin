@@ -1,10 +1,11 @@
-
+%{?_javapackages_macros:%_javapackages_macros}
 %global group_id  org.apache.maven.plugins
 
 Name:             maven-jarsigner-plugin
 Version:          1.2
-Release:          8%{?dist}
+Release:          8.1
 Summary:          Signs or verifies a project artifact and attachments using jarsigner
+Group:		Development/Java
 License:          ASL 2.0
 URL:              http://maven.apache.org/plugins/%{name}/
 # http://search.maven.org/remotecontent?filepath=org/apache/maven/plugins/maven-jarsigner-plugin/1.2/maven-jarsigner-plugin-1.2-source-release.zip
