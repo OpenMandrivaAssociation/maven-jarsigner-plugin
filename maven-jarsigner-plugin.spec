@@ -1,20 +1,29 @@
 %{?_javapackages_macros:%_javapackages_macros}
-%global group_id  org.apache.maven.plugins
-
+%global bootstrap 1
 Name:             maven-jarsigner-plugin
-Version:          1.2
-Release:          8.1
+Version:          1.3.2
+Release:          3.1
 Summary:          Signs or verifies a project artifact and attachments using jarsigner
-Group:		Development/Java
+Group:            Development/Java
 License:          ASL 2.0
 URL:              http://maven.apache.org/plugins/%{name}/
-# http://search.maven.org/remotecontent?filepath=org/apache/maven/plugins/maven-jarsigner-plugin/1.2/maven-jarsigner-plugin-1.2-source-release.zip
-Source0:          http://search.maven.org/remotecontent?filepath=org/apache/maven/plugins/%{name}/%{version}/%{name}-%{version}-source-release.zip
-
+Source0:          http://repo1.maven.org/maven2/org/apache/maven/plugins/%{name}/%{version}/%{name}-%{version}-source-release.zip
+Source1:	  ftp://ftp.muug.mb.ca/mirror/fedora/linux/development/rawhide/i386/os/Packages/m/maven-jarsigner-plugin-1.3.2-3.fc22.noarch.rpm
 BuildArch:        noarch
 
-BuildRequires:    java-devel
-BuildRequires:    maven-local
+BuildRequires:  maven-local
+BuildRequires:  mvn(org.apache.maven.plugin-tools:maven-plugin-annotations)
+BuildRequires:  mvn(org.apache.maven.plugins:maven-plugin-plugin)
+BuildRequires:  mvn(org.apache.maven.plugins:maven-plugins:pom:)
+%if !%bootstrap
+BuildRequires:  mvn(org.apache.maven.shared:maven-jarsigner) >= 1.3.2
+%endif
+BuildRequires:  mvn(org.apache.maven.shared:maven-shared-utils) >= 0.6
+BuildRequires:  mvn(org.apache.maven:maven-artifact)
+BuildRequires:  mvn(org.apache.maven:maven-plugin-api)
+BuildRequires:  mvn(org.apache.maven:maven-project)
+BuildRequires:  mvn(org.sonatype.plexus:plexus-sec-dispatcher)
+BuildRequires:  mvn(org.apache.maven.plugins:maven-invoker-plugin)
 
 %description
 This plugin provides the capability to sign or verify
@@ -40,19 +49,61 @@ This package contains the API documentation for %{name}.
 
 %build
 
+%if !%bootstrap
 %mvn_file :%{name} %{name}
+# ITs fail on Koji
 %mvn_build
+%endif
 
 %install
+
+%if !%bootstrap
 %mvn_install
+%else
+touch .mfiles
+touch .mfiles-javadoc
+pushd %buildroot
+
+rpm2cpio %{SOURCE1} | cpio -idmv
+
+popd
+
+%endif
 
 %files -f .mfiles
 %doc LICENSE NOTICE DEPENDENCIES
+%if %bootstrap
+/usr/share/java/maven-jarsigner-plugin.jar
+/usr/share/maven-metadata/maven-jarsigner-plugin.xml
+/usr/share/maven-poms/maven-jarsigner-plugin.pom
+%endif
 
 %files javadoc -f .mfiles-javadoc
 %doc LICENSE NOTICE
 
 %changelog
+* Mon Aug  4 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.2-3
+- Fix build-requires on parent POM
+
+* Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
+* Mon Mar 24 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.2-1
+- Update to upstream version 1.3.2
+- Skip running ITs
+
+* Tue Mar 04 2014 Stanislav Ochotnicky <sochotnicky@redhat.com> - 1.3.1-3
+- Use Requires: java-headless rebuild (#1067528)
+
+* Wed Feb 26 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.1-2
+- Enable integration tests
+
+* Tue Jan  7 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.1-1
+- Update to upstream version 1.3.1
+
+* Thu Jan  2 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3-1
+- Update to upstream version 1.3
+
 * Mon Aug 12 2013 gil cattaneo <puntogil@libero.it> 1.2-8
 - fix rhbz#992192
 - update to current packaging guidelines
@@ -78,3 +129,4 @@ This package contains the API documentation for %{name}.
 
 * Wed May 18 2011 Jaromir Capik <jcapik@redhat.com> - 1.2-1
 - Initial version of the package
+
