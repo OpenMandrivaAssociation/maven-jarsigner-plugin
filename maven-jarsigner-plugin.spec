@@ -1,7 +1,7 @@
 %{?_javapackages_macros:%_javapackages_macros}
 Name:             maven-jarsigner-plugin
 Version:          1.3.2
-Release:          3.1
+Release:          3.2
 Summary:          Signs or verifies a project artifact and attachments using jarsigner
 Group:            Development/Java
 License:          ASL 2.0
