@@ -5,7 +5,7 @@ Release:          3.4
 Summary:          Signs or verifies a project artifact and attachments using jarsigner
 Group:            Development/Java
 License:          ASL 2.0
-URL:              http://maven.apache.org/plugins/%{name}/
+URL:              https://maven.apache.org/plugins/%{name}/
 Source0:          http://repo1.maven.org/maven2/org/apache/maven/plugins/%{name}/%{version}/%{name}-%{version}-source-release.zip
 BuildArch:        noarch
 
